@@ -15,11 +15,9 @@ namespace PositionBasedDynamics
 
         public List<Constraint> Constraints { get; private set; }
 
-        public Entity(int numParticles, float radius, float mass)
+        public Entity(ParticlesData particles, float mass)
         {
 
         }
-
-
     }
 }

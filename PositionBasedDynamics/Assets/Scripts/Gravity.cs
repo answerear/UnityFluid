@@ -7,7 +7,7 @@ namespace PositionBasedDynamics
 {
     public class Gravity : Force
     {
-        public override void ApplyForce(double dt, Entity entity)
+        public override void ApplyToEntity(double dt, Entity entity)
         {
             throw new System.NotImplementedException();
         }

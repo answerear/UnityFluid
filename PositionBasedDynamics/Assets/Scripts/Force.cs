@@ -7,6 +7,6 @@ namespace PositionBasedDynamics
 {
     public abstract class Force
     {
-        public abstract void ApplyForce(double dt, Entity entity);
+        public abstract void ApplyToEntity(double dt, Entity entity);
     }
 }
