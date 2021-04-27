@@ -98,7 +98,7 @@ namespace PositionBasedDynamics
 
         #endregion
 
-        #region 布料
+        #region cloth
         public Vector3 wind { get; set; }
 
         public float drag { get; set; }
@@ -106,7 +106,7 @@ namespace PositionBasedDynamics
         public float lift { get; set; }
         #endregion
 
-        #region 流体
+        #region fluid
         public float cohesion { get; set; }
 
         public float surfaceTension { get; set; }
@@ -130,7 +130,7 @@ namespace PositionBasedDynamics
         public float buoyancy { get; set; }
         #endregion
 
-        #region 散射
+        #region diffuse
         public float diffuseThreshold { get; set; }
 
         public float diffuseBuoyancy { get; set; }
@@ -140,7 +140,7 @@ namespace PositionBasedDynamics
         public float diffuseLifetime { get; set; }
         #endregion
 
-        #region 碰撞
+        #region collision
         public float collisionDistance { get; set; }
 
         public float particleCollisionMargin { get; set; }
