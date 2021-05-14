@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace UnifiedParticlePhysX
 {
-    public class DensityConstraint : Constraint
+    public class ShapeMatchingConstraint : Constraint
     {
         public override void project()
         {

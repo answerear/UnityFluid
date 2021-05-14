@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace UnifiedParticlePhysX
 {
-    public class HashGridNeighborSearcher : PointNeighborSearcher
+    public class FluidEntity : Entity
     {
-        
+
     }
 }

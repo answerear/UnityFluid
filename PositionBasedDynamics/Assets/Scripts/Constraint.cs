@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace PositionBasedDynamics
+namespace UnifiedParticlePhysX
 {
-    public class Constraint
+    /// <summary>
+    /// 抽象约束类
+    /// </summary>
+    public abstract class Constraint
     {
+        public abstract void project();
     }
 }

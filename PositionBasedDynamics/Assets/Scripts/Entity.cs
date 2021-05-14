@@ -3,19 +3,61 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace PositionBasedDynamics
+namespace UnifiedParticlePhysX
 {
-    public abstract class Entity 
+    public enum Phase
     {
-        public List<Vector3> Positions { get; private set; }
+        kNone = 0,
+        kRigidbody,
+        kFluid
+    }
 
-        public List<Vector3> Predicted { get; private set; }
+    /// <summary>
+    /// 实体类
+    /// </summary>
+    public class Entity 
+    {
+        /// <summary>
+        /// 系统外力
+        /// </summary>
+        public List<Force> externalForces { get; private set; }
 
-        public List<Vector3> Velocities { get; private set; }
+        /// <summary>
+        /// 系统内力
+        /// </summary>
+        public List<Force> internalForces { get; private set; }
 
-        public List<Constraint> Constraints { get; private set; }
+        /// <summary>
+        /// 粒子索引
+        /// </summary>
+        public List<int> particles { get; set; }
 
-        public Entity(ParticlesData particles, float mass)
+        /// <summary>
+        /// 实体质量
+        /// </summary>
+        public float mass { get; set; }
+
+        /// <summary>
+        /// 质心位置
+        /// </summary>
+        public float massCenter { get; set; }
+
+        public void AddExternalForce<T>(T force) where T : Force
+        {
+
+        }
+
+        public void RemoveExternalForce<T>() where T : Force
+        {
+
+        }
+
+        public void AddInternalForce<T>(T force) where T : Force
+        {
+
+        }
+
+        public void RemoveInternalForce<T>() where T : Force
         {
 
         }

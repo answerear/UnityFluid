@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace PositionBasedDynamics
+namespace UnifiedParticlePhysX
 {
     public abstract class Force
     {
