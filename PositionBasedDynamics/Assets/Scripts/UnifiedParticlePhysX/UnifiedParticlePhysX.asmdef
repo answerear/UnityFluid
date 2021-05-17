@@ -1,0 +1,15 @@
+{
+    "name": "UnifiedParticlePhysX",
+    "references": [
+        "GUID:0f21751107d7d0c4c9ec05d94448ce94"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
