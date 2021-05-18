@@ -7,3 +7,5 @@
 /Packages
 /Temp
 /.vsconfig
+/Framework.csproj
+/UnifiedParticlePhysX.csproj
