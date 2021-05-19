@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Framework;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace UnifiedParticlePhysX
     /// 其中 d 取两个粒子重叠部分，即 $d = \parallel \vec{x}_i - \vec{x}_j \parallel - 2 r$
     /// 
     /// </summary>
-    public class ContactConstraint : Constraint
+    public class ContactConstraint : Constraint, IPoolObject
     {
         /// <summary>
         /// 一个要判断接触点的索引
@@ -27,29 +28,29 @@ namespace UnifiedParticlePhysX
         /// </summary>
         public int particleIndex2;
 
-        /// <summary>
-        /// 粒子集合
-        /// </summary>
-        protected List<Particle> particles;
+        public Solver solver;
 
-        /// <summary>
-        /// 粒子静态距离
-        /// </summary>
-        protected float restDistance;
-
-        public ContactConstraint(List<Particle> points, float restDist)
+        public ContactConstraint()
         {
-            particles = points;
-            restDistance = restDist;
+            solver = null;
+            particleIndex1 = particleIndex2 = -1;
+        }
+
+        public void OnRecycle()
+        {
+            solver = null;
             particleIndex1 = particleIndex2 = -1;
         }
 
         public override void project()
         {
-            if (particles == null || particleIndex1 == particleIndex2)
+            if (solver == null || !(solver is SolverCPU) || particleIndex1 == particleIndex2)
             {
                 return;
             }
+
+            SolverCPU solverCPU = solver as SolverCPU;
+            var particles = solverCPU.particles;
 
             Particle particle1 = particles[particleIndex1];
             Particle particle2 = particles[particleIndex2];
@@ -59,7 +60,7 @@ namespace UnifiedParticlePhysX
 
             Vector3 n = p1 - p2;
 
-            float d = n.magnitude - 2 * restDistance;
+            float d = n.magnitude - 2 * solver.radius;
             if (d > 0)
             {
                 // 超出两个粒子接触距离，直接退出
