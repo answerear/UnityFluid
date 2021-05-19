@@ -96,10 +96,10 @@ namespace UnifiedParticlePhysX
         {
             // $$
             // \vec{n^*}_{ij} =
-            // \begin{ cases}
+            // \begin{cases}
             // \vec{x}_{ij} - 2(\vec{x}_{ij} \cdot \vec{n}_{ij}) \vec{n}_{ij} \quad &\vec{x}_{ij} \cdot \vec{n}_{ij} < 0 \\
             // \vec{x}_{ij} \quad & otherwise
-            // \end{ cases}
+            // \end{cases}
             // $$
             Vector3 x12 = p1.predictPosition - p2.predictPosition;
 
