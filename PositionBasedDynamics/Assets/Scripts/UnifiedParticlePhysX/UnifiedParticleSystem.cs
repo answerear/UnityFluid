@@ -12,6 +12,21 @@ namespace UnifiedParticlePhysX
 
         private List<Solver> solvers = new List<Solver>();
 
+        public UnifiedParticleSystem()
+        {
+
+        }
+
+        public void Startup()
+        {
+            ObjectsPools.CreateInstance();
+        }
+
+        public void Shutdown()
+        {
+            ObjectsPools.DestroyInstance();
+        }
+
         public Solver CreateSolver(bool isCPUSolver = true)
         {
             Solver solver = null;

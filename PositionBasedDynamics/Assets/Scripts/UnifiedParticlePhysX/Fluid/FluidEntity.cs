@@ -5,8 +5,11 @@ using UnityEngine;
 
 namespace UnifiedParticlePhysX
 {
-    public class FluidEntity : Entity
+    internal class FluidEntity : Entity
     {
-
+        /// <summary>
+        /// 流体密度
+        /// </summary>
+        public float density = 0.0f;
     }
 }

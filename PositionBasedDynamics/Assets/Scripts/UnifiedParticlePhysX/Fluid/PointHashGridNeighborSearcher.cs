@@ -1,4 +1,5 @@
 ﻿using Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,16 +7,23 @@ using UnityEngine;
 
 namespace UnifiedParticlePhysX
 {
-    sealed class PointHashGridNeighborSearcher : PointNeighborSearcher
+    internal sealed class PointHashGridNeighborSearcher : PointNeighborSearcher, IPoolObject
     {
-        private List<Particle> particles;
+        public List<Particle> particles;
 
-        private Vector3Int resolution;
-        private float gridSpacing;
-        private List<int> indices;
-        private List<List<int>> buckets;
+        public Vector3Int resolution;
+        public float gridSpacing;
+
+        public List<int> indices { get; protected set; }
+        public List<List<int>> buckets { get; protected set; }
 
         #region 构造函数
+        public PointHashGridNeighborSearcher()
+            : this(null, 0, 0, 0, 0.0f)
+        {
+
+        }
+
         public PointHashGridNeighborSearcher(List<Particle> points, Vector3Int res, float spacing)
             : this(points, res.x, res.y, res.z, spacing)
         {
@@ -37,6 +45,11 @@ namespace UnifiedParticlePhysX
         #endregion
 
         #region 重写接口
+        public void OnRecycle()
+        {
+            
+        }
+
         public override void Build(List<int> points)
         {
             buckets.Clear();
@@ -60,7 +73,7 @@ namespace UnifiedParticlePhysX
             }
         }
 
-        public override void ForeachNearbyPoint(int origin, float radius, Callback<int, int> callback)
+        public override void ForeachNearbyPoint(int origin, float radius, Action<int, int> handler)
         {
             if (buckets.Count == 0)
             {
@@ -82,9 +95,12 @@ namespace UnifiedParticlePhysX
                     float d2 = (p.predictPosition - o.predictPosition).sqrMagnitude;
                     if (d2 < r2)
                     {
+                        Callback<int, int> callback = ObjectsPools.Instance.AcquireObject<Callback<int, int>>();
                         callback.Arg1 = pointIndex;
                         callback.Arg2 = indices[pointIndex];
+                        callback.Handler = handler;
                         callback.Run();
+                        ObjectsPools.Instance.ReleaseObject(callback);
                     }
                 }
             }

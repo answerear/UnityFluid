@@ -5,9 +5,14 @@ using UnityEngine;
 
 namespace UnifiedParticlePhysX
 {
-    public class ShapeMatchingConstraint : Constraint
+    internal class ShapeMatchingConstraint : Constraint
     {
-        public override void project()
+        public override void Project()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void UpdateCounts()
         {
             throw new System.NotImplementedException();
         }

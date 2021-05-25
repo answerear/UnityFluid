@@ -52,5 +52,10 @@ namespace UnifiedParticlePhysX
             body = entity;
             numberOfNeighbors = 0;
         }
+
+        public void FrameInit()
+        {
+            numberOfNeighbors = 0;
+        }
     }
 }

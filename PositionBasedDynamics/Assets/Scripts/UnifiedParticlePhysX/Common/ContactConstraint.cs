@@ -16,35 +16,41 @@ namespace UnifiedParticlePhysX
     /// 其中 d 取两个粒子重叠部分，即 $d = \parallel \vec{x}_i - \vec{x}_j \parallel - 2 r$
     /// 
     /// </summary>
-    public class ContactConstraint : Constraint, IPoolObject
+    internal class ContactConstraint : Constraint, IPoolObject
     {
         /// <summary>
         /// 一个要判断接触点的索引
         /// </summary>
-        public int particleIndex1;
+        public int particleIndex1 { get; protected set; }
 
         /// <summary>
         /// 一个要判断接触点的索引
         /// </summary>
-        public int particleIndex2;
+        public int particleIndex2 { get; protected set; }
 
-        public Solver solver;
+        protected float distance;
+        protected Vector3 normal;
 
         public ContactConstraint()
         {
-            solver = null;
             particleIndex1 = particleIndex2 = -1;
+        }
+
+        public void Init(Solver s, int index1, int index2)
+        {
+            Init(s);
+            particleIndex1 = index1;
+            particleIndex2 = index2;
         }
 
         public void OnRecycle()
         {
-            solver = null;
-            particleIndex1 = particleIndex2 = -1;
+            Init(null, -1, -1);
         }
 
-        public override void project()
+        public override void Project()
         {
-            if (solver == null || !(solver is SolverCPU) || particleIndex1 == particleIndex2)
+            if (solver == null || !(solver is SolverCPU) || particleIndex1 == -1 || particleIndex1 == particleIndex2)
             {
                 return;
             }
@@ -52,13 +58,10 @@ namespace UnifiedParticlePhysX
             SolverCPU solverCPU = solver as SolverCPU;
             var particles = solverCPU.particles;
 
-            Particle particle1 = particles[particleIndex1];
-            Particle particle2 = particles[particleIndex2];
+            Particle p1 = particles[particleIndex1];
+            Particle p2 = particles[particleIndex2];
 
-            Vector3 p1 = particle1.position;
-            Vector3 p2 = particle2.position;
-
-            Vector3 n = p1 - p2;
+            Vector3 n = p1.position - p2.position;
 
             float d = n.magnitude - 2 * solver.radius;
             if (d > 0)
@@ -75,17 +78,32 @@ namespace UnifiedParticlePhysX
 
             n /= n.magnitude;
 
-            float w = particle1.inverseMass + particle2.inverseMass;
+            float w = p1.inverseMass + p2.inverseMass;
             Vector3 offset = d * n;
 
-            Vector3 deltaP1 = -particle1.inverseMass / w * offset / particle1.numberOfNeighbors;
-            Vector3 deltaP2 = particle2.inverseMass / w * offset / particle2.numberOfNeighbors;
+            Vector3 dx1 = -p1.inverseMass / w * offset / p1.numberOfNeighbors;
+            Vector3 dx2 = p2.inverseMass / w * offset / p2.numberOfNeighbors;
 
-            particle1.position += deltaP1;
-            particle2.position += deltaP2;
+            // 更新
+            p1.position += dx1;
+            p2.position += dx2;
 
-            particle1.predictPosition += deltaP1;
-            particle2.predictPosition += deltaP2;
+            p1.predictPosition += dx1;
+            p2.predictPosition += dx2;
+        }
+
+        public override void UpdateCounts()
+        {
+            if (solver == null || !(solver is SolverCPU) || particleIndex1 == -1 || particleIndex1 == particleIndex2)
+            {
+                return;
+            }
+
+            SolverCPU solverCPU = solver as SolverCPU;
+            Particle p1 = solverCPU.particles[particleIndex1];
+            Particle p2 = solverCPU.particles[particleIndex2];
+            p1.numberOfNeighbors++;
+            p2.numberOfNeighbors++;
         }
     }
 }

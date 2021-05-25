@@ -24,6 +24,11 @@ namespace UnifiedParticlePhysX
             throw new NotImplementedException();
         }
 
+        public override void Start()
+        {
+            throw new NotImplementedException();
+        }
+
         public override void Step(float dt, int substeps)
         {
             throw new NotImplementedException();
