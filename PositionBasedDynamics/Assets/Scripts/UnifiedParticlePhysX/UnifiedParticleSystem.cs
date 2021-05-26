@@ -10,11 +10,11 @@ namespace UnifiedParticlePhysX
     {
         public const float kEpsilon = 0.0001f;
 
-        private List<Solver> solvers = new List<Solver>();
+        public List<Solver> solvers { get; private set; }
 
         public UnifiedParticleSystem()
         {
-
+            solvers = new List<Solver>();
         }
 
         public void Startup()
@@ -43,6 +43,14 @@ namespace UnifiedParticlePhysX
             solvers.Add(solver);
 
             return solver;
+        }
+
+        public void Step(float dt)
+        {
+            foreach (Solver s in solvers)
+            {
+                s.Step(dt, 1);
+            }
         }
 
         public void DestroySolver(Solver solver)

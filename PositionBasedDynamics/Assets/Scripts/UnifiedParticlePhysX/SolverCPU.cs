@@ -21,7 +21,7 @@ namespace UnifiedParticlePhysX
             int i = 0;
             for (i = 0; i < (int)Constraint.Group.kMax; ++i)
             {
-                constraints[i] = new List<Constraint>();
+                constraints.Add(new List<Constraint>());
             }
         }
 

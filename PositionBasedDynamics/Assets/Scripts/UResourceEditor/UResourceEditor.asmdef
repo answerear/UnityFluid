@@ -1,0 +1,16 @@
+{
+    "name": "UResourceEditor",
+    "references": [
+        "GUID:0f21751107d7d0c4c9ec05d94448ce94",
+        "GUID:8edb2d5d851af6449b558c0db959af9d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
