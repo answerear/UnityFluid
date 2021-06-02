@@ -195,13 +195,15 @@ namespace UnifiedParticlePhysX
         #region 公有接口
         public abstract EntityID CreateRigidbody(List<Vector3> positions, float mass);
 
-        public abstract EntityID CreateFluid(List<Vector3> positions, float mass);
+        public abstract EntityID CreateFluid(List<Vector3> positions, float density);
 
         public abstract void DestroyEntity(EntityID entityID);
 
         public abstract void Start();
 
         public abstract void Step(float dt, int substeps);
+
+        public abstract List<Vector3> GetEntityPositions(EntityID entity);
         #endregion
     }
 }

@@ -33,5 +33,10 @@ namespace UnifiedParticlePhysX
         {
             throw new NotImplementedException();
         }
+
+        public override List<Vector3> GetEntityPositions(int entity)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

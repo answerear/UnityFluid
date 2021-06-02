@@ -1,4 +1,7 @@
-﻿using Framework;
+﻿
+// #define USE_STABILIZATION
+
+using Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,9 +34,21 @@ namespace UnifiedParticlePhysX
             return CreateEntity<RigidbodyEntity>(positions, mass, Phase.kRigidbody);
         }
 
-        public override EntityID CreateFluid(List<Vector3> positions, float mass)
+        public override EntityID CreateFluid(List<Vector3> positions, float density)
         {
-            return CreateEntity<FluidEntity>(positions, mass, Phase.kFluid);
+            float diameter = radius * 2.0f;
+            float mass = 0.8f * diameter * diameter * diameter * density;
+            EntityID id = CreateEntity<FluidEntity>(positions, mass, Phase.kFluid);
+
+            if (id != INVALID_ENTITY)
+            {
+                DensityConstraint constraint = ObjectsPools.Instance.AcquireObject<DensityConstraint>();
+                FluidEntity entity = entities[id] as FluidEntity;
+                constraint.Init(this, entity, density, radius);
+                constraints[(int)Constraint.Group.kStandard].Add(constraint);
+            }
+
+            return id;
         }
 
         public override void DestroyEntity(EntityID entityID)
@@ -44,9 +59,13 @@ namespace UnifiedParticlePhysX
         public override void Start()
         {
             // 计算个平面包围空间的边界，没有的情况下，默认给一个非常远的边界
+#if true
+            bound.center = Vector3.zero;
+            bound.extents = new Vector3(500.0f, 500.0f, 500.0f);
+#else
             float minX, minY, minZ, maxX, maxY, maxZ;
-            minX = minY = minZ = 10000.0f;
-            maxX = maxY = maxZ = -10000.0f;
+            minX = minY = minZ = -1000.0f;
+            maxX = maxY = maxZ = 1000.0f;
 
             Vector3[] minPoints = new Vector3[numPlanes];
             Vector3[] maxPoints = new Vector3[numPlanes];
@@ -87,41 +106,72 @@ namespace UnifiedParticlePhysX
                 }
             }
 
-            minX = minY = minZ = float.MaxValue;
-            maxX = maxY = maxZ = float.MinValue;
+            //minX = minY = minZ = float.MinValue;
+            //maxX = maxY = maxZ = float.MaxValue;
+
+            Vector3 minSize = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            Vector3 maxSize = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
             for (int i = 0; i < numPlanes; ++i)
             {
-                if (minPoints[i].x < minX)
+                //if (minPoints[i].x > minX)
+                //{
+                //    minX = minPoints[i].x;
+                //}
+                //else if (maxPoints[i].x < maxX)
+                //{
+                //    maxX = maxPoints[i].x;
+                //}
+
+                //if (minPoints[i].y > minY)
+                //{
+                //    minY = minPoints[i].y;
+                //}
+                //else if (maxPoints[i].y < maxY)
+                //{
+                //    maxY = maxPoints[i].y;
+                //}
+
+                //if (minPoints[i].z > minZ)
+                //{
+                //    minZ = minPoints[i].z;
+                //}
+                //else if (maxPoints[i].z < maxZ)
+                //{
+                //    maxZ = maxPoints[i].z;
+                //}
+
+                if (minPoints[i].x != minX && minPoints[i].x < minSize.x)
                 {
-                    minX = minPoints[i].x;
+                    minSize.x = minPoints[i].x;
                 }
-                else if (maxPoints[i].x > maxX)
+                else if (maxPoints[i].x != maxX && maxPoints[i].x > maxSize.x)
                 {
-                    maxX = maxPoints[i].x;
+                    maxSize.x = maxPoints[i].x;
                 }
 
-                if (minPoints[i].y < minY)
+                if (minPoints[i].y != minY && minPoints[i].y < minSize.y)
                 {
-                    minY = minPoints[i].y;
+                    minSize.y = minPoints[i].y;
                 }
-                else if (maxPoints[i].y > maxY)
+                else if (maxPoints[i].y != maxY && maxPoints[i].y > maxSize.y)
                 {
-                    maxY = maxPoints[i].y;
+                    maxSize.y = maxPoints[i].y;
                 }
 
-                if (minPoints[i].z < minZ)
+                if (minPoints[i].z != minZ && minPoints[i].z < minSize.z)
                 {
-                    minZ = minPoints[i].z;
+                    minSize.z = minPoints[i].z;
                 }
-                else if (maxPoints[i].z > maxZ)
+                else if (maxPoints[i].z != maxZ && maxPoints[i].z > maxSize.z)
                 {
-                    maxZ = maxPoints[i].z;
+                    maxSize.z = maxPoints[i].z;
                 }
             }
 
-            bound.min = new Vector3(minX, minY, minZ);
-            bound.max = new Vector3(maxX, maxY, maxZ);
+            bound.min = minSize;
+            bound.max = maxSize;
+#endif
         }
 
         public override void Step(float dt, int substeps)
@@ -132,6 +182,19 @@ namespace UnifiedParticlePhysX
             {
                 Update(t);
             }
+        }
+
+        public override List<Vector3> GetEntityPositions(EntityID id)
+        {
+            List<Vector3> positions = new List<Vector3>();
+
+            Entity entity = entities[id];
+            for (int i = 0; i < entity.particles.Count; ++i)
+            {
+                positions.Add(particles[entity.particles[i]].position);
+            }
+
+            return positions;
         }
         #endregion
 
@@ -148,7 +211,7 @@ namespace UnifiedParticlePhysX
             float invMass = 1.0f / (mass);
 
             // 创建实体对应的粒子
-            for (int i = 0; i < particles.Count; ++i)
+            for (int i = 0; i < positions.Count; ++i)
             {
                 Particle particle = new Particle(positions[i], invMass, phase, entityID);
                 int index = particles.Count;
@@ -215,6 +278,7 @@ namespace UnifiedParticlePhysX
                 }
             }
 
+#if USE_STABILIZATION
             // 10: for iter < stabilizationIterations do
             for (int i = 0; i < kStabilizationIterations; ++i)
             {
@@ -229,6 +293,7 @@ namespace UnifiedParticlePhysX
                 }
             }
             // 15: end for
+#endif
 
             // 16: while iter < solverIterations do
             for (int i = 0; i < numIterations; ++i)
@@ -237,7 +302,7 @@ namespace UnifiedParticlePhysX
                 for (int j = 1; j < (int)Constraint.Group.kMax; ++j)
                 {
                     List<Constraint> tmpConstraints = constraints[j];
-                    for (int k = 0; i < tmpConstraints.Count; ++k)
+                    for (int k = 0; k < tmpConstraints.Count; ++k)
                     {
                         // 18: ∆x⇐0, n⇐0
                         // 19: solve all constraints in G for ∆x,n
@@ -273,6 +338,18 @@ namespace UnifiedParticlePhysX
                 }
             }
             // 28: end for
+
+            List<Constraint> contactConstraints = constraints[(int)Constraint.Group.kContact];
+            contactConstraints.Clear();
+
+            List<Constraint> stabiliationConstraints = constraints[(int)Constraint.Group.kStabilization];
+            for (int i = 0; i < stabiliationConstraints.Count; ++i)
+            {
+                BoundaryConstraint constraint = stabiliationConstraints[i] as BoundaryConstraint;
+                ObjectsPools.Instance.ReleaseObject(constraint);
+            }
+
+            stabiliationConstraints.Clear();
         }
 
         private void GetEntityAndExternalForce(Particle particle, out Entity entity, out Force force)
@@ -317,17 +394,29 @@ namespace UnifiedParticlePhysX
                         // 两个都是刚体，用刚体接触约束。 这里还包含了摩擦力的计算
                         RigidContactConstraint constraint = ObjectsPools.Instance.AcquireObject<RigidContactConstraint>();
                         RigidbodyEntity body = entities[p.body] as RigidbodyEntity;
-                        constraint.Init(this, body, index, j);
+#if USE_STABILIZATION
+                        constraint.Init(this, body, index, j, true);
+#else
+                        constraint.Init(this, body, index, j, false);
+#endif
                         constraints[(int)Constraint.Group.kContact].Add(constraint);
+#if USE_STABILIZATION
                         constraints[(int)Constraint.Group.kStabilization].Add(constraint);
+#endif
                     }
                     else if (p.phase == Phase.kRigidbody || p2.phase == Phase.kRigidbody)
                     {
                         // 其中之一是刚体，使用普通接触约束
                         ContactConstraint constraint = ObjectsPools.Instance.AcquireObject<ContactConstraint>();
-                        constraint.Init(this, index, j);
+#if USE_STABILIZATION
+                        constraint.Init(this, index, j, true);
+#else
+                        constraint.Init(this, index, j, false);
+#endif
                         constraints[(int)Constraint.Group.kContact].Add(constraint);
+#if USE_STABILIZATION
                         constraints[(int)Constraint.Group.kStabilization].Add(constraint);
+#endif
                     }
                 }
             }
@@ -335,6 +424,7 @@ namespace UnifiedParticlePhysX
 
         private void FindSolidContacts(List<List<Constraint>> constraints, Particle p, int index)
         {
+#if false
             for (int j = 0; j < numPlanes; ++j)
             {
                 Vector3 n = new Vector3(planes[j, 0], planes[j, 1], planes[j, 2]);
@@ -345,11 +435,117 @@ namespace UnifiedParticlePhysX
                 {
                     // 超出边界
                     BoundaryConstraint constraint = ObjectsPools.Instance.AcquireObject<BoundaryConstraint>();
-                    constraint.Init(this, index, n, d);
+                    //constraint.Init(this, index, n, d, false);
+#if USE_STABILIZATION
+                    BoundaryConstraint.Boundary[] bound = new BoundaryConstraint.Boundary[6]
+                    {
+                        BoundaryConstraint.Boundary.kLeft, BoundaryConstraint.Boundary.kRight,
+                        BoundaryConstraint.Boundary.kTop, BoundaryConstraint.Boundary.kBottom,
+                        BoundaryConstraint.Boundary.kForward, BoundaryConstraint.Boundary.kBack,
+                    };
+
+                    float[] vals = new float[6] 
+                    { 
+                        -Mathf.Abs(d), Mathf.Abs(d), 
+                        Mathf.Abs(d), -Mathf.Abs(d), 
+                        Mathf.Abs(d), -Mathf.Abs(d) 
+                    };
+
+                    constraint.Init(this, index, bound[j], vals[j], false);
+#else
+#endif
                     constraints[(int)Constraint.Group.kContact].Add(constraint);
+#if USE_STABILIZATION
                     constraints[(int)Constraint.Group.kStabilization].Add(constraint);
+#endif
                 }
             }
+#else
+            if (p.predictPosition.x < -Mathf.Abs(planes[0, 3]) + radius)
+            {
+                // Out of left
+                BoundaryConstraint constraint = ObjectsPools.Instance.AcquireObject<BoundaryConstraint>();
+#if USE_STABILIZATION
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kLeft, -Mathf.Abs(planes[0, 3]), true);
+#else
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kLeft, -Mathf.Abs(planes[0, 3]), false);
+#endif
+                constraints[(int)Constraint.Group.kContact].Add(constraint);
+#if USE_STABILIZATION
+                 constraints[(int)Constraint.Group.kStabilization].Add(constraint);
+#endif
+            }
+            else if (p.predictPosition.x > Mathf.Abs(planes[1, 3]) - radius)
+            {
+                // Out of right
+                BoundaryConstraint constraint = ObjectsPools.Instance.AcquireObject<BoundaryConstraint>();
+#if USE_STABILIZATION
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kRight, Mathf.Abs(planes[1, 3]), true);
+#else
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kRight, Mathf.Abs(planes[1, 3]), false);
+#endif
+                constraints[(int)Constraint.Group.kContact].Add(constraint);
+#if USE_STABILIZATION
+                 constraints[(int)Constraint.Group.kStabilization].Add(constraint);
+#endif
+            }
+            else if (p.predictPosition.y > Mathf.Abs(planes[2, 3]) - radius)
+            {
+                // Out of top
+                BoundaryConstraint constraint = ObjectsPools.Instance.AcquireObject<BoundaryConstraint>();
+#if USE_STABILIZATION
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kTop, Mathf.Abs(planes[2, 3]), true);
+#else
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kTop, Mathf.Abs(planes[2, 3]), false);
+#endif
+                constraints[(int)Constraint.Group.kContact].Add(constraint);
+#if USE_STABILIZATION
+                 constraints[(int)Constraint.Group.kStabilization].Add(constraint);
+#endif
+            }
+            else if (p.predictPosition.y < -Mathf.Abs(planes[3, 3]) + radius)
+            {
+                // Out of bottom
+                BoundaryConstraint constraint = ObjectsPools.Instance.AcquireObject<BoundaryConstraint>();
+#if USE_STABILIZATION
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kBottom, -Mathf.Abs(planes[3, 3]), true);
+#else
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kBottom, -Mathf.Abs(planes[3, 3]), false);
+#endif
+                constraints[(int)Constraint.Group.kContact].Add(constraint);
+#if USE_STABILIZATION
+                 constraints[(int)Constraint.Group.kStabilization].Add(constraint);
+#endif
+            }
+            else if (p.predictPosition.z > Mathf.Abs(planes[4, 3]) - radius)
+            {
+                // Out of forward
+                BoundaryConstraint constraint = ObjectsPools.Instance.AcquireObject<BoundaryConstraint>();
+#if USE_STABILIZATION
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kForward, Mathf.Abs(planes[4, 3]), true);
+#else
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kForward, Mathf.Abs(planes[4, 3]), false);
+#endif
+                constraints[(int)Constraint.Group.kContact].Add(constraint);
+#if USE_STABILIZATION
+                 constraints[(int)Constraint.Group.kStabilization].Add(constraint);
+#endif
+            }
+            else if (p.predictPosition.z < -Math.Abs(planes[5, 3]) + radius)
+            {
+                // Out of back
+                BoundaryConstraint constraint = ObjectsPools.Instance.AcquireObject<BoundaryConstraint>();
+#if USE_STABILIZATION
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kBack, -Mathf.Abs(planes[5, 3]), true);
+#else
+                constraint.Init(this, index, BoundaryConstraint.Boundary.kBack, -Mathf.Abs(planes[5, 3]), false);
+#endif
+                constraints[(int)Constraint.Group.kContact].Add(constraint);
+#if USE_STABILIZATION
+                 constraints[(int)Constraint.Group.kStabilization].Add(constraint);
+#endif
+            }
+#endif
         }
         #endregion
     }

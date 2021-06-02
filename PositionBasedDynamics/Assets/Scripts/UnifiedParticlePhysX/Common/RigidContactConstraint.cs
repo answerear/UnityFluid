@@ -17,15 +17,15 @@ namespace UnifiedParticlePhysX
             normal.x = normal.y = normal.z = 0.0f;
         }
 
-        public void Init(Solver s, RigidbodyEntity entity, int index1, int index2)
+        public void Init(Solver s, RigidbodyEntity entity, int index1, int index2, bool stable)
         {
-            Init(s, index1, index2);
+            Init(s, index1, index2, stable);
             rigidbody = entity;
         }
 
         public new void OnRecycle()
         {
-            Init(null, null, -1, -1);
+            Init(null, null, -1, -1, false);
         }
 
         public override void Project()

@@ -28,6 +28,8 @@ namespace UnifiedParticlePhysX
         /// </summary>
         public int particleIndex2 { get; protected set; }
 
+        public bool stabile { get; protected set; }
+
         protected float distance;
         protected Vector3 normal;
 
@@ -36,16 +38,17 @@ namespace UnifiedParticlePhysX
             particleIndex1 = particleIndex2 = -1;
         }
 
-        public void Init(Solver s, int index1, int index2)
+        public void Init(Solver s, int index1, int index2, bool stable)
         {
             Init(s);
             particleIndex1 = index1;
             particleIndex2 = index2;
+            stabile = stable;
         }
 
         public void OnRecycle()
         {
-            Init(null, -1, -1);
+            Init(null, -1, -1, false);
         }
 
         public override void Project()
@@ -85,8 +88,11 @@ namespace UnifiedParticlePhysX
             Vector3 dx2 = p2.inverseMass / w * offset / p2.numberOfNeighbors;
 
             // 更新
-            p1.position += dx1;
-            p2.position += dx2;
+            if (stabile)
+            {
+                p1.position += dx1;
+                p2.position += dx2;
+            }
 
             p1.predictPosition += dx1;
             p2.predictPosition += dx2;

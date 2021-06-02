@@ -61,13 +61,19 @@ namespace UnifiedParticlePhysX
             }
 
             // Allocate memory chunks
-            buckets.Capacity = resolution.x * resolution.y * resolution.z;
+            int size = resolution.x * resolution.y * resolution.z;
+            buckets.Capacity = size;
             indices.Capacity = points.Count;
+
+            for (int i = 0; i < size; ++i)
+            {
+                buckets.Add(new List<int>());
+            }
 
             // Put points into buckets
             for (int i = 0; i < points.Count; ++i)
             {
-                indices[i] = points[i];
+                indices.Add(points[i]);
                 int key = GetHashKeyFromPosition(points[i]);
                 buckets[key].Add(i);
             }
