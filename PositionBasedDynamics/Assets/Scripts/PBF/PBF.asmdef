@@ -1,0 +1,15 @@
+{
+    "name": "PBF",
+    "references": [
+        "GUID:0d3ac8e8f5697e549a0321230bcddcf2"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
