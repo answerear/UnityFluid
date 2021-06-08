@@ -18,7 +18,7 @@ namespace UnifiedParticlePhysX
             indices = new List<int>();
         }
 
-        public override void Build(List<int> points)
+        public override void Build(List<Particle> points)
         {
             indices.Clear();
 
@@ -27,10 +27,7 @@ namespace UnifiedParticlePhysX
                 return;
             }
 
-            for (int i = 0; i < points.Count; ++i)
-            {
-                indices.Add(points[i]);
-            }
+            particles = points;
         }
 
         public override void ForeachNearbyPoint(int origin, float radius, Action<int, int> handler)

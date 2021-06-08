@@ -22,15 +22,15 @@ namespace UPPhysXDemo
 
             GameObject go;
 
-            // 物理世界边界
-            go = ResourceManager.Instance.LoadPrefabSync("PBD", "Prefabs", "Boundary");
-            go.transform.SetParent(transform);
-            boundary = go.GetComponent<Boundary>();
-
             // 创建流体
             go = ResourceManager.Instance.LoadPrefabSync("PBD", "Prefabs", "BoxFluid");
             go.transform.SetParent(transform);
             fluid = go.GetComponent<BoxFluid>();
+
+            // 物理世界边界
+            go = ResourceManager.Instance.LoadPrefabSync("PBD", "Prefabs", "Boundary");
+            go.transform.SetParent(transform);
+            boundary = go.GetComponent<Boundary>();
 
             solver.Start();
         }

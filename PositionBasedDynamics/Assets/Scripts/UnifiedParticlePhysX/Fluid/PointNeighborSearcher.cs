@@ -16,7 +16,7 @@ namespace UnifiedParticlePhysX
         /// </summary>
         /// <param name="particles">粒子集合</param>
         /// <param name="indices">使用到的粒子索引集合</param>
-        public abstract void Build(List<int> indices);
+        public abstract void Build(List<Particle> particles);
 
         /// <summary>
         /// 查找附近相邻的点

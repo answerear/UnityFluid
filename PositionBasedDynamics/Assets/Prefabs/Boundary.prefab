@@ -45,5 +45,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 7171c51abe153da45b16738fbf8ad527, type: 2}
   bound:
-    m_Center: {x: 0, y: 20, z: 0}
-    m_Extent: {x: 20, y: 20, z: 20}
+    m_Center: {x: 0, y: 2.5, z: 0}
+    m_Extent: {x: 5, y: 5, z: 5}

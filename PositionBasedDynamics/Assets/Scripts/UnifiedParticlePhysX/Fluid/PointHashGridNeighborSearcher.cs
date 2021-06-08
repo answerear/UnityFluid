@@ -50,33 +50,33 @@ namespace UnifiedParticlePhysX
             
         }
 
-        public override void Build(List<int> points)
+        public override void Build(List<Particle> points)
         {
-            buckets.Clear();
-            indices.Clear();
+            //buckets.Clear();
+            //indices.Clear();
 
-            if (points.Count == 0)
-            {
-                return;
-            }
+            //if (points.Count == 0)
+            //{
+            //    return;
+            //}
 
-            // Allocate memory chunks
-            int size = resolution.x * resolution.y * resolution.z;
-            buckets.Capacity = size;
-            indices.Capacity = points.Count;
+            //// Allocate memory chunks
+            //int size = resolution.x * resolution.y * resolution.z;
+            //buckets.Capacity = size;
+            //indices.Capacity = points.Count;
 
-            for (int i = 0; i < size; ++i)
-            {
-                buckets.Add(new List<int>());
-            }
+            //for (int i = 0; i < size; ++i)
+            //{
+            //    buckets.Add(new List<int>());
+            //}
 
-            // Put points into buckets
-            for (int i = 0; i < points.Count; ++i)
-            {
-                indices.Add(points[i]);
-                int key = GetHashKeyFromPosition(points[i]);
-                buckets[key].Add(i);
-            }
+            //// Put points into buckets
+            //for (int i = 0; i < points.Count; ++i)
+            //{
+            //    indices.Add(points[i]);
+            //    int key = GetHashKeyFromPosition(points[i]);
+            //    buckets[key].Add(i);
+            //}
         }
 
         public override void ForeachNearbyPoint(int origin, float radius, Action<int, int> handler)

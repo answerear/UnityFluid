@@ -9,7 +9,8 @@ namespace UnifiedParticlePhysX
     {
         kNone = 0,
         kRigidbody,
-        kFluid
+        kFluid,
+        kBoundary,
     }
 
     /// <summary>

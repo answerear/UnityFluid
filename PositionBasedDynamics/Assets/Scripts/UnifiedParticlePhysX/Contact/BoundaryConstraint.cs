@@ -60,7 +60,7 @@ namespace UnifiedParticlePhysX
             SolverCPU solverCPU = solver as SolverCPU;
             Particle p = solverCPU.particles[index];
 
-            float extra = 0.0f;
+            float extra = (p.phase == Phase.kFluid ? Random.Range(0.0f, 1.0f) * 0.003f : 0.0f);
             float d = solver.radius + extra;
             Vector3 n = Vector3.zero;
 
@@ -76,7 +76,7 @@ namespace UnifiedParticlePhysX
                         p.predictPosition.x = value + d;
                         if (stabile)
                         {
-                            p.predictPosition.x = value + d;
+                            p.position.x = value + d;
                         }
                         n = Vector3.right;
                     }
@@ -91,7 +91,7 @@ namespace UnifiedParticlePhysX
                         p.predictPosition.x = value - d;
                         if (stabile)
                         {
-                            p.predictPosition.x = value - d;
+                            p.position.x = value - d;
                         }
                         n = Vector3.left;
                     }
@@ -106,7 +106,7 @@ namespace UnifiedParticlePhysX
                         p.predictPosition.y = value - d;
                         if (stabile)
                         {
-                            p.predictPosition.y = value - d;
+                            p.position.y = value - d;
                         }
                         n = Vector3.down;
                     }
@@ -121,9 +121,11 @@ namespace UnifiedParticlePhysX
                         p.predictPosition.y = value + d;
                         if (stabile)
                         {
-                            p.predictPosition.y = value + d;
+                            p.position.y = value + d;
                         }
                         n = Vector3.up;
+
+                        Log.Debug("PBD", "Touch bottom boundary particle #", index, " ", p.predictPosition.ToString(), " ", p.position.ToString());
                     }
                     break;
                 case Boundary.kForward: // 前边界
@@ -136,7 +138,7 @@ namespace UnifiedParticlePhysX
                         p.predictPosition.z = value - d;
                         if (stabile)
                         {
-                            p.predictPosition.z = value - d;
+                            p.position.z = value - d;
                         }
                         n = Vector3.back;
                     }
@@ -151,7 +153,7 @@ namespace UnifiedParticlePhysX
                         p.predictPosition.z = value + d;
                         if (stabile)
                         {
-                            p.predictPosition.z = value + d;
+                            p.position.z = value + d;
                         }
                         n = Vector3.forward;
                     }

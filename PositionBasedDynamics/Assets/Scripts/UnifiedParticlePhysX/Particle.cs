@@ -37,6 +37,8 @@ namespace UnifiedParticlePhysX
         /// </summary>
         public int body;
 
+        public float lambda;
+
         /// <summary>
         /// 当前粒子相接触的粒子数量
         /// </summary>
@@ -50,12 +52,14 @@ namespace UnifiedParticlePhysX
             inverseMass = invMass;
             phase = ph;
             body = entity;
+            lambda = 0.0f;
             numberOfNeighbors = 0;
         }
 
         public void FrameInit()
         {
             numberOfNeighbors = 0;
+            lambda = 0.0f;
         }
     }
 }

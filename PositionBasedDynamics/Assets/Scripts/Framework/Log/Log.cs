@@ -55,6 +55,26 @@ namespace Framework
             WriteLog(LEVEL.Debug, tag, arg1, arg2, arg3, arg4);
         }
 
+        public static void Debug<T1, T2, T3, T4, T5>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            WriteLog(LEVEL.Debug, tag, arg1, arg2, arg3, arg4, arg5);
+        }
+
+        public static void Debug<T1, T2, T3, T4, T5, T6>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            WriteLog(LEVEL.Debug, tag, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
+        public static void Debug<T1, T2, T3, T4, T5, T6, T7>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+        {
+            WriteLog(LEVEL.Debug, tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }
+
+        public static void Debug<T1, T2, T3, T4, T5, T6, T7, T8>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
+        {
+            WriteLog(LEVEL.Debug, tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+        }
+
         public static void Info<T1>(string tag, T1 arg1)
         {
             WriteLog(LEVEL.Info, tag, arg1);
@@ -72,7 +92,27 @@ namespace Framework
 
         public static void Info<T1, T2, T3, T4>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            WriteLog(LEVEL.Info, tag, arg1, arg2, arg3);
+            WriteLog(LEVEL.Info, tag, arg1, arg2, arg3, arg4);
+        }
+
+        public static void Info<T1, T2, T3, T4, T5>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            WriteLog(LEVEL.Info, tag, arg1, arg2, arg3, arg4, arg5);
+        }
+
+        public static void Info<T1, T2, T3, T4, T5, T6>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            WriteLog(LEVEL.Info, tag, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
+        public static void Info<T1, T2, T3, T4, T5, T6, T7>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T6 arg7)
+        {
+            WriteLog(LEVEL.Info, tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }
+
+        public static void Info<T1, T2, T3, T4, T5, T6, T7, T8>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T6 arg7, T8 arg8)
+        {
+            WriteLog(LEVEL.Info, tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
         }
 
         public static void Warning<T1>(string tag, T1 arg1)
@@ -92,7 +132,27 @@ namespace Framework
 
         public static void Warning<T1, T2, T3, T4>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
-            WriteLog(LEVEL.Warning, tag, arg1, arg2, arg3);
+            WriteLog(LEVEL.Warning, tag, arg1, arg2, arg3, arg4);
+        }
+
+        public static void Warning<T1, T2, T3, T4, T5>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            WriteLog(LEVEL.Warning, tag, arg1, arg2, arg3, arg4, arg5);
+        }
+
+        public static void Warning<T1, T2, T3, T4, T5, T6>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            WriteLog(LEVEL.Warning, tag, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
+        public static void Warning<T1, T2, T3, T4, T5, T6, T7>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T6 arg7)
+        {
+            WriteLog(LEVEL.Warning, tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }
+
+        public static void Warning<T1, T2, T3, T4, T5, T6, T7, T8>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T6 arg7, T8 arg8)
+        {
+            WriteLog(LEVEL.Warning, tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
         }
 
         public static void Error<T1>(string tag, T1 arg1)
@@ -113,6 +173,26 @@ namespace Framework
         public static void Error<T1, T2, T3, T4>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
         {
             WriteLog(LEVEL.Error, tag, arg1, arg2, arg3, arg4);
+        }
+
+        public static void Error<T1, T2, T3, T4, T5>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            WriteLog(LEVEL.Error, tag, arg1, arg2, arg3, arg4, arg5);
+        }
+
+        public static void Error<T1, T2, T3, T4, T5, T6>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            WriteLog(LEVEL.Error, tag, arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
+        public static void Error<T1, T2, T3, T4, T5, T6, T7>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T6 arg7)
+        {
+            WriteLog(LEVEL.Error, tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }
+
+        public static void Error<T1, T2, T3, T4, T5, T6, T7, T8>(string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T6 arg7, T8 arg8)
+        {
+            WriteLog(LEVEL.Error, tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
         }
 
         private static void TrimStringBuffer()
@@ -189,6 +269,80 @@ namespace Framework
             StrBuffer.Append(arg2);
             StrBuffer.Append(arg3);
             StrBuffer.Append(arg4);
+            AppendErrorStack(level, tag);
+
+            int lvl = (int)level;
+            PrintLog(lvl, StrBuffer.ToString());
+        }
+
+        private static void WriteLog<T1, T2, T3, T4, T5>(LEVEL level, string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+        {
+            TrimStringBuffer();
+
+            StrBuffer.Append(tag);
+            StrBuffer.Append(mSpliter);
+            StrBuffer.Append(arg1);
+            StrBuffer.Append(arg2);
+            StrBuffer.Append(arg3);
+            StrBuffer.Append(arg4);
+            StrBuffer.Append(arg5);
+            AppendErrorStack(level, tag);
+
+            int lvl = (int)level;
+            PrintLog(lvl, StrBuffer.ToString());
+        }
+
+        private static void WriteLog<T1, T2, T3, T4, T5, T6>(LEVEL level, string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+        {
+            TrimStringBuffer();
+
+            StrBuffer.Append(tag);
+            StrBuffer.Append(mSpliter);
+            StrBuffer.Append(arg1);
+            StrBuffer.Append(arg2);
+            StrBuffer.Append(arg3);
+            StrBuffer.Append(arg4);
+            StrBuffer.Append(arg5);
+            StrBuffer.Append(arg6);
+            AppendErrorStack(level, tag);
+
+            int lvl = (int)level;
+            PrintLog(lvl, StrBuffer.ToString());
+        }
+
+        private static void WriteLog<T1, T2, T3, T4, T5, T6, T7>(LEVEL level, string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7)
+        {
+            TrimStringBuffer();
+
+            StrBuffer.Append(tag);
+            StrBuffer.Append(mSpliter);
+            StrBuffer.Append(arg1);
+            StrBuffer.Append(arg2);
+            StrBuffer.Append(arg3);
+            StrBuffer.Append(arg4);
+            StrBuffer.Append(arg5);
+            StrBuffer.Append(arg6);
+            StrBuffer.Append(arg7);
+            AppendErrorStack(level, tag);
+
+            int lvl = (int)level;
+            PrintLog(lvl, StrBuffer.ToString());
+        }
+
+        private static void WriteLog<T1, T2, T3, T4, T5, T6, T7, T8>(LEVEL level, string tag, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8)
+        {
+            TrimStringBuffer();
+
+            StrBuffer.Append(tag);
+            StrBuffer.Append(mSpliter);
+            StrBuffer.Append(arg1);
+            StrBuffer.Append(arg2);
+            StrBuffer.Append(arg3);
+            StrBuffer.Append(arg4);
+            StrBuffer.Append(arg5);
+            StrBuffer.Append(arg6);
+            StrBuffer.Append(arg7);
+            StrBuffer.Append(arg8);
             AppendErrorStack(level, tag);
 
             int lvl = (int)level;

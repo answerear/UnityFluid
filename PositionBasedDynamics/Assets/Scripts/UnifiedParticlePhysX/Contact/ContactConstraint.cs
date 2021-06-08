@@ -64,7 +64,16 @@ namespace UnifiedParticlePhysX
             Particle p1 = particles[particleIndex1];
             Particle p2 = particles[particleIndex2];
 
-            Vector3 n = p1.position - p2.position;
+            Vector3 n = Vector3.zero;
+
+            if (stabile)
+            {
+                n = p1.position - p2.position;
+            }
+            else
+            {
+                n = p1.predictPosition - p2.predictPosition;
+            }
 
             float d = n.magnitude - 2 * solver.radius;
             if (d > 0)

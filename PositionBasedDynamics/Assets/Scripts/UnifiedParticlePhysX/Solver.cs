@@ -54,17 +54,17 @@ namespace UnifiedParticlePhysX
         /// <summary>
         /// 与有形状物体碰撞时使用的摩擦系数 
         /// </summary>
-        public float dynamicFriction;
+        public float dynamicFriction = 0.0f;
 
         /// <summary>
         /// 与有形状物体碰撞时使用的静态摩擦系数
         /// </summary>
-        public float staticFriction;
+        public float staticFriction = 0.0f;
 
         /// <summary>
         /// 粒子间碰撞时使用的摩擦系数
         /// </summary>
-        public float particleFriction;
+        public float particleFriction = 0.0f;
 
         /// <summary>
         /// 与有形状物体碰撞时使用的恢复系数，粒子碰撞始终时无弹性的。
@@ -185,12 +185,20 @@ namespace UnifiedParticlePhysX
 
         public float shapeCollisionMargin;
 
-        public float[,] planes = null;
+        public float[,] planes 
+        { 
+            get { return _planes; } 
+            set { OnSetPlanes(value); } 
+        }
 
         public int numPlanes = 0;
         #endregion
 
-        internal Bounds bound;
+        public EntityID boundary { get; protected set; }
+
+        protected Bounds bound;
+
+        private float[,] _planes = null;
 
         #region 公有接口
         public abstract EntityID CreateRigidbody(List<Vector3> positions, float mass);
@@ -205,5 +213,7 @@ namespace UnifiedParticlePhysX
 
         public abstract List<Vector3> GetEntityPositions(EntityID entity);
         #endregion
+
+        protected virtual void OnSetPlanes(float[,] planes) { }
     }
 }

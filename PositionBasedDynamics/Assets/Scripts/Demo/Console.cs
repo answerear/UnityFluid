@@ -1,11 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 
 namespace UPPhysXDemo
 {
-    public class Debug
+    public class Console
     {
         public enum LogLevel
         {
@@ -16,6 +18,20 @@ namespace UPPhysXDemo
             Debug,
             Warning,
             MAX,
+        }
+
+        private static StreamWriter writer = null;
+
+        public static void Startup()
+        {
+            string path = Application.persistentDataPath + "/" + "Demo.log";
+            FileInfo fi = new FileInfo(path);
+            writer = fi.CreateText();
+        }
+
+        public static void Shutdown()
+        {
+            writer.Dispose();
         }
 
         static private void PrintLog(LogLevel level, string msg)
@@ -46,6 +62,7 @@ namespace UPPhysXDemo
                     break;
             }
 #endif
+            writer.WriteLine(msg);
         }
 
         static public void WriteLog(int level, string msg)

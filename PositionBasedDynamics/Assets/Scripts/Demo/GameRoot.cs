@@ -16,7 +16,8 @@ namespace UPPhysXDemo
         {
             instance = this;
 
-            Framework.Log.PrintLog = Debug.WriteLog;
+            Console.Startup();
+            Framework.Log.PrintLog = Console.WriteLog;
 
             FrameworkSystem.CreateInstance();
             FrameworkSystem.Instance.Startup(0);
@@ -52,6 +53,7 @@ namespace UPPhysXDemo
             FrameworkSystem.Instance.Shutdown();
             FrameworkSystem.DestroyInstance();
 
+            Console.Shutdown();
             instance = null;
         }
     }
