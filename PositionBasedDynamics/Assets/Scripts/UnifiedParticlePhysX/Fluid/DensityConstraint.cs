@@ -37,9 +37,8 @@ namespace UnifiedParticlePhysX
             restDensity = rho0;
 
             float d = h * 2.0f;
-            kernel = new SPHKernel(d);
-            //d = h * 4.0f;
-            //kernel = new CubicKernel(d);
+            //kernel = new SPHKernel(d);
+            kernel = new CubicKernel(d);
             DQ = 0.2f * kernel.H;
             DQ2 = DQ * DQ;
 
@@ -142,8 +141,9 @@ namespace UnifiedParticlePhysX
                     else if (pj.phase == Phase.kBoundary)
                     {
                         // particle j is boundary
+                        Debug.Assert(pi.phase != Phase.kBoundary);
                         BoundaryEntity boundary = s.entities[pj.body] as BoundaryEntity;
-                        density += boundary.psi[index - boundary.particles[0]] * kernel.W(pi.predictPosition - pj.predictPosition); ;
+                        density += boundary.psi[index - boundary.particles[0]] * kernel.W(pi.predictPosition - pj.predictPosition);
                     }
                     else
                     {
@@ -166,6 +166,7 @@ namespace UnifiedParticlePhysX
             float C = Mathf.Max(density / restDensity - 1.0f, 0.0f);
 
             float lambda = 0.0f;
+            float invDensity = 1.0f / restDensity;
 
             int idx = i - fluid.particles[0];
 
@@ -185,15 +186,16 @@ namespace UnifiedParticlePhysX
                         if (pj.phase == Phase.kBoundary)
                         {
                             // boundary
+                            Debug.Assert(pi.phase != Phase.kBoundary);
                             BoundaryEntity boundary = s.entities[pj.body] as BoundaryEntity;
-                            Vector3 gradCj = -boundary.psi[index - boundary.particles[0]] * kernel.GradW(pi.predictPosition - pj.predictPosition);
+                            Vector3 gradCj = -boundary.psi[index - boundary.particles[0]] * kernel.GradW(pi.predictPosition - pj.predictPosition) * invDensity;
                             sumGradC2 += gradCj.sqrMagnitude;
                             gradCi -= gradCj;
                         }
                         else
                         {
                             // fluid
-                            Vector3 gradCj = - kernel.GradW(pi.predictPosition - pj.predictPosition) / (restDensity * pj.inverseMass);
+                            Vector3 gradCj = - kernel.GradW(pi.predictPosition - pj.predictPosition) * invDensity / pj.inverseMass;
                             sumGradC2 += gradCj.sqrMagnitude;
                             gradCi -= gradCj;
                         }
@@ -218,6 +220,7 @@ namespace UnifiedParticlePhysX
 
             int idx = i - fluid.particles[0];
             float lambdai = fluid.lambdas[idx];
+            float invDensity = 1.0f / restDensity;
 
             for (int j = 0; j < fluid.neighbors[idx].Count; ++j)
             {
@@ -226,13 +229,14 @@ namespace UnifiedParticlePhysX
 
                 if (pj.phase == Phase.kBoundary)
                 {
+                    Debug.Assert(pi.phase != Phase.kBoundary);
                     BoundaryEntity boundary = s.entities[pj.body] as BoundaryEntity;
-                    Vector3 gradCj = -boundary.psi[index - boundary.particles[0]] / restDensity * kernel.GradW(pi.predictPosition - pj.predictPosition);
+                    Vector3 gradCj = -boundary.psi[index - boundary.particles[0]] * invDensity * kernel.GradW(pi.predictPosition - pj.predictPosition);
                     corr -= (lambdai) * gradCj;
                 }
                 else
                 {
-                    Vector3 gradCj = -kernel.GradW(pi.predictPosition - pj.predictPosition) / (pj.inverseMass * restDensity);
+                    Vector3 gradCj = -kernel.GradW(pi.predictPosition - pj.predictPosition) * invDensity / pj.inverseMass;
                     float lambdaj = fluid.lambdas[j];
                     corr -= (lambdai + lambdaj) * gradCj;
                 }

@@ -129,7 +129,7 @@ namespace UPPhysXDemo
         {
             GameObject goVisible = new GameObject("Visible_Sphere");
             goVisible.transform.SetParent(transform);
-            goVisible.SetActive(true);
+            goVisible.SetActive(false);
 
             List<Vector3> positions = solver.GetEntityPositions(solver.boundary);
             float diameter = solver.radius * 2.0f;
