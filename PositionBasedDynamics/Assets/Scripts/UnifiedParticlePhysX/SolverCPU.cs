@@ -195,11 +195,14 @@ namespace UnifiedParticlePhysX
                 particles.Add(p);
             }
 
-            SPHKernel kernel = new SPHKernel(radius);
+            boundary.psi = new float[boundary.particles.Count];
+
+            float h = radius * 2.0f;
+            SPHKernel kernel = new SPHKernel(h);
+#if false
+            
             SimpleListNeighborSearcher searcher = new SimpleListNeighborSearcher();
             searcher.Build(particles);
-
-            boundary.psi = new float[boundary.particles.Count];
 
             for (int i = 0; i < boundary.particles.Count; ++i)
             {
@@ -207,10 +210,10 @@ namespace UnifiedParticlePhysX
                 Particle p1 = particles[index];
                 float delta = kernel.ZERO;
 
-                searcher.ForeachNearbyPoint(index, radius,
+                searcher.ForeachNearbyPoint(index, radius * 2.0f,
                     (int neighborIndex, int j) =>
                     {
-                        if (i != j)
+                        if (index != j)
                         {
                             Particle p2 = particles[j];
                             delta += kernel.W(p1.position - p2.position);
@@ -220,6 +223,32 @@ namespace UnifiedParticlePhysX
                 float volume = 1.0f / delta;
                 boundary.psi[i] = density * volume;
             }
+#else
+            float d2 = h * h;
+            for (int i = 0; i < boundary.particles.Count; ++i)
+            {
+                int index = boundary.particles[i];
+                float delta = kernel.ZERO;
+                Particle pi = particles[index];
+
+                for (int j = 0; j < boundary.particles.Count; ++j)
+                {
+                    if (i != j)
+                    {
+                        int idx = boundary.particles[j];
+                        Particle pj = particles[idx];
+                        Vector3 dist = pi.position - pj.position;
+                        if (dist.sqrMagnitude <= d2)
+                        {
+                            delta += kernel.W(dist);
+                        }
+                    }
+                }
+
+                float volume = 1.0f / delta;
+                boundary.psi[i] = density * volume;
+            }
+#endif
 
             return entity;
         }
@@ -357,7 +386,7 @@ namespace UnifiedParticlePhysX
             int idx = i - fluid.particles[0];
             fluid.neighbors[idx].Clear();
 
-            searcher.ForeachNearbyPoint(i, radius,
+            searcher.ForeachNearbyPoint(i, 2.0f*radius,
                 (int neighborIndex, int j) =>
                 {
                     pi.numberOfNeighbors++;
@@ -370,6 +399,8 @@ namespace UnifiedParticlePhysX
                         fluid.neighbors[idx].Add(j);
                     }
                 });
+
+            ObjectsPools.Instance.ReleaseObject(searcher);
 #else
             Particle pi = particles[i];
             if (pi.phase == Phase.kBoundary)
@@ -389,7 +420,7 @@ namespace UnifiedParticlePhysX
             {
                 Particle pj = particles[j];
                 Vector3 dist = pi.predictPosition - pj.predictPosition;
-                if (dist.sqrMagnitude < d2)
+                if (dist.sqrMagnitude <= d2)
                 {
                     pi.numberOfNeighbors++;
                     fluid.neighbors[idx].Add(j);
