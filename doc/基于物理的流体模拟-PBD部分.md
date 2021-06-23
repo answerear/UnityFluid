@@ -211,5 +211,16 @@ $$
 \end{aligned}
 \right.
 $$
+最后解得：
+$$
+\left\{
+\begin{aligned}
+& \lambda = \frac{C(\pmb{p})}{\nabla C(\pmb{p})^T M^{-1} \nabla C(\pmb{p})} \\
+& \Delta \pmb{p} = - \lambda M^{-1} \nabla C(\pmb{p})
+\end{aligned}
+\right.
+$$
+自此，我们求出了单个约束的解。然而，实际情况是，我们一个点会受很多条件约束，也就是存在多约束的情况。接下来，我们看看多个约束优化如何求解
 
+### 多个约束优化求解
 
