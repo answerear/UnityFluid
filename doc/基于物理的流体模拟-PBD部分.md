@@ -224,17 +224,32 @@ $$
 
 ### 多个约束优化求解
 
-TO DO
+前面讨论的都是 N 个粒子受 1 个约束的情况：
+$$
+\Delta \pmb{p} = -\lambda \pmb{M}^{-1} \nabla C(\pmb{p})
+$$
+这里
+$$
+\Delta \pmb{p} = \begin{bmatrix} \Delta \vec{p}_1 \\ \vdots \\ \Delta \vec{p}_n\end{bmatrix}
+$$
+这是受一个约束的情况。那么多个约束是怎样的？N 个粒子受 M 个约束的情况：
+$$
+\begin{aligned}
+\pmb{\Delta p_1} &= -\lambda_1 \pmb{M}^{-1} \nabla C_1(\pmb{p}) \\
+\pmb{\Delta p_2} &= -\lambda_2 \pmb{M}^{-1} \nabla C_2(\pmb{p}) \\
+\qquad \qquad \vdots \\
+\pmb{\Delta p_M} &= -\lambda_M \pmb{M}^{-1} \nabla C_M(\pmb{p}) \\
+\end{aligned}
+$$
+可以看出，这里是由 M 个约束构成的一个方程组。而在物理模拟中约束的个数，梯度的维数都无法保证，彼此间是否线性相关也无法保证，所以这个方程组可能有唯一解，也可能没有解，也可能有无限多个解。如图所示，三个等式约束，但是无法同时满足这三个约束，所以是无解的。那是不是就无法去求解呢？在 PBD 中，直接忽略这种有无解的情况，换了另外的方式去求解。我们看下 PBD 可以用什么方法求解，并且相关的方法会带来什么问题。
 
-### 方程组求解方法
+雅可比迭代法
 
 
 
 ### 求解器
 
 
-
-### Global vs. Gauss-Seidel
 
 ### 约束求解优先级
 
