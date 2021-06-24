@@ -224,3 +224,114 @@ $$
 
 ### 多个约束优化求解
 
+TO DO
+
+### 方程组求解方法
+
+
+
+### 求解器
+
+
+
+### Global vs. Gauss-Seidel
+
+### 约束求解优先级
+
+在实践中，不同约束类型之间的处理是有优先级的，为了实现这个，我们按照约束类型分组，相同约束类型的分成一组。然后优先级高的约束分组先处理，先求出 $\Delta \vec{p}_i$ 并把该值累加到原位移 $\vec{p}_i$ 上，然后再处理其他优先级较低的约束分组。例如，先处理碰撞约束，让粒子跟物体不发生接触，把该分离后的位置应用到原位移上，得出新位置 $\vec{p}_i^*$ ，然后再处理流体密度约束。这种方式能加快约束修正位置的收敛速度，能够快速接近真实解。
+
+前面讲了一大堆，这就是 PBD 算法的全貌和细节。当然，具体的约束根据物体形态不一样，应用不一样的约束条件。接下来我们看看流体相关的约束及其处理。
+
+### PBF——流体的密度约束
+
+在不可压缩流体模拟中，我们希望粒子 $i$ 的密度尽量与静止密度 $\rho_0$ 相同，即 $\rho_i = \rho_0$ 。因此需要针对每一个流体粒子都施加一个常量密度约束，PBF 将该约束定义为：
+$$
+C_i(\vec{p}_1, \cdots, \vec{p}_n) = \frac{\rho_i}{\rho_0} - 1
+$$
+从这里可以看到，我们要求密度约束，我们已经知道静止密度 $\rho_0$ ，所以剩下就是求粒子 $i$ 的密度 $\rho_i$ 。前面在 SPH 那一节我们提到如何求空间位置 $\vec{x}_i$  一个物理量：
+$$
+A_i = \sum_j \frac{m_j}{\rho_j} A_j W(\vec{x}_i - \vec{x}_j, h)
+$$
+我们在回顾下这个公式，其中 $j$ 表示所有邻居粒子，W 是核函数，就是求权重的，h 是核半径，$\vec{x}_i - \vec{x}_j$ 就是两个粒子之间的距离了。
+
+好，有了这个公式之后，既然 $A_i$ 是物理量，那么密度也是一种物理量，所以可以把密度直接代入该公式，可以得出粒子 $i$ 的密度是：
+$$
+\rho_i = \sum_j m_j W(\vec{x}_i - \vec{x}_j, h)
+$$
+由于流体每个粒子质量相等，所以在这里我们可以省去质量 $m_j$ ，按照前述 PBD 的算法，需要用到约束 $C_i$ 的梯度，这里梯度是：
+$$
+\nabla_{\vec{x}_k} C_i = \frac{1}{\rho_0} \sum_j \nabla_{\vec{x}_k} W(\vec{x}_i - \vec{x}_j, h)
+$$
+这里看起来也比较简单，但是大家注意到没有，这里的下标变成 $\vec{x}_k$ ，多了个 $k$ ，这表明不仅仅是邻居粒子 $j$ 这么简单了。所以这里又有两种情况：粒子 $k$ 为粒子 $i$ 自身（$k=i$）或粒子 $i$ 的邻居粒子 $j$ （$k=j$），即：
+$$
+\nabla_{\vec{x}_k} = \frac{1}{\rho_0}
+\begin{cases}
+\sum_j \nabla_{\vec{x}_k} W(\vec{p}_i - \vec{x}_j, h) \quad &k = i \\
+- \nabla_{\vec{x}_k} W(\vec{x}_i - \vec{x}_j, h) \quad &k = j
+\end{cases}
+$$
+我们可以这么理解：
+
+1. 当 $k=i$ 时，$\nabla_{\vec{x}_k} C_i = \nabla_{\vec{x}_i}C_i$ 表示约束函数 $C_i$ 关于 $\vec{x}_i$ 的梯度，方向为 $\frac{\vec{x}_i-\vec{x}_j}{\parallel \vec{x}_i - \vec{x}_j\parallel} $ 
+2. 当 $k=j$ 时，$\nabla_{\vec{x}_k} C_i = \nabla_{\vec{x}_j}C_i$ 表示约束函数 $C_i$ 关于 $\vec{x}_j$ 的梯度，方向为 $-\frac{\vec{x}_i-\vec{x}_j}{\parallel \vec{x}_i - \vec{x}_j\parallel}$
+
+不知道大家注意到没有，求密度的时候，是用附近邻居的密度按照权重来计算自己的密度，求密度的时候求和是没有自己的。但是这里求梯度，却要分自己和邻居，为什么会这样子呢？其实按照前述SPH的算法，是整个场的所有粒子都考虑进去的，只是因为邻居以外的粒子权重为0 ，所以相邻范围外的粒子的梯度就不要参与计算，但是范围里的所有粒子都参与计算，所以这里要考虑上自己的梯度值。又由于自己的梯度值无法直接得出，所以用附近邻居的粒子的梯度值加权近似求得。
+
+最后按照前述的PBD方法需要求拉格朗日乘子：
+$$
+\lambda = - \frac{C(\pmb{p})}{\nabla C(\pmb{p})^T \nabla C(\pmb{p})} =- \frac{C(\pmb{p})}{\parallel \nabla C(\pmb{p})\parallel^2}
+$$
+把其展开，即：
+$$
+\lambda_i = - \frac{C_i(\vec{p}_i, \cdots, \vec{p}_n)}{\sum_k \parallel \nabla_{\vec{p}_k} C_i\parallel^2}
+$$
+这个拉格朗日乘子 $\lambda_i$ 对于一个约束 $C_i(\vec{x}_i, \cdots, \vec{x}_n)$ 中所有的粒子而言都是一样的。
+
+还有一个问题，这个W权重函数，就是前面SPH提到的核函数。
+
+### PBF——拉格朗日乘子中的除0
+
+如果一个约束条件不能被违反，则称为硬约束；反之，能够一定程度上被违反的约束为软约束。理想情况下，我们当然希望约束始终都是硬约束，但是由于计算误差或者数值稳定性等原因，我们有时也需要约束呈现出软性质。
+
+在 PBF 中，当 $\parallel \vec{r} \parallel = h$ 时，即邻居粒子 $j$  处于粒子 $i$ 的光滑核半径 $h$ 边缘时（此时粒子 $i$ 和粒子 $j$ 处于分离状态），则前述的 Spiky 核函数梯度值 $\nabla W(\vec{r}, h) = 0$ 。如果粒子之间都处于这种状态，由前述的PBF梯度公式可知：
+$$
+\begin{aligned}
+& \nabla_{\vec{x}_j}C_i = - \frac{1}{\rho_0} \nabla_{\vec{x}_j}W(\vec{r}, h) = 0 \\
+& \nabla_{\vec{x}_i}C_i = \frac{1}{\rho_0} \sum_j \nabla_{\vec{x}_i}W(\vec{r}, h) = 0
+\end{aligned}
+$$
+从而前述拉格朗日乘子的分母 $\sum_k \parallel \nabla_{\vec{p}_k} C_i \parallel^2 = 0$ ，这会导致除零错误。为了解决这个问题，PBF 借鉴了 Open Dynamics Engine 中混合约束力方法，使密度约束变成软约束。具体做法就是直接加入一个松弛参数 $\epsilon$ ，这个由用户直接指定。则拉格朗日乘子变成：
+$$
+\lambda_i = - \frac{C_i(\vec{p}_i, \cdots, \vec{p}_n)}{\sum_k \parallel \nabla_{\vec{p}_k} C_i\parallel^2 + \epsilon}
+$$
+经过上述一轮推导，最终的粒子 $i$ 的修正位移为：
+$$
+\begin{aligned}
+\Delta \vec{x}_i &= \lambda_i \nabla_{\vec{x}_i} C_i + \sum_j \lambda_j \nabla_{\vec{x}_j} C_i \\
+&= \frac{1}{\rho_0} \sum_j \lambda_i \nabla_{\vec{x}_i} W(\vec{r}, h) + (-\frac{1}{\rho_0} \sum_j \lambda_j \nabla_{\vec{x}_j} W(\vec{r}, h)) \\
+&= \frac{1}{\rho_0} \sum_j \lambda_i \nabla_{\vec{x}_i} W(\vec{r}, h) + \frac{1}{\rho_0} \sum_j \lambda_j \nabla_{\vec{x}_i} W(\vec{r}, h) \\
+&= \frac{1}{\rho_0} \sum_j （\lambda_i + \lambda_j）\nabla_{\vec{x}_i} W(\vec{r}, h) 
+\end{aligned}
+$$
+这里等式第二步推导中，负号怎么变正号了？大家回忆上前述提到的：
+
+1. 当 $k=i$ 时，$\nabla_{\vec{x}_k} C_i = \nabla_{\vec{x}_i}C_i$ 表示约束函数 $C_i$ 关于 $\vec{x}_i$ 的梯度，方向为 $\frac{\vec{x}_i-\vec{x}_j}{\parallel \vec{x}_i - \vec{x}_j\parallel} $ 
+2. 当 $k=j$ 时，$\nabla_{\vec{x}_k} C_i = \nabla_{\vec{x}_j}C_i$ 表示约束函数 $C_i$ 关于 $\vec{x}_j$ 的梯度，方向为 $-\frac{\vec{x}_i-\vec{x}_j}{\parallel \vec{x}_i - \vec{x}_j\parallel}$
+
+所以这里 $\nabla_{\vec{x}_j}C_i$ 方向上是跟 $\nabla_{\vec{x}_i}C_i$ 相反的，所以这里负号变成正号，约束函数 $C_i$ 关于 $\vec{x}_j$ 的梯度就变成约束函数 $C_i$ 关于 $\vec{x}_i$ 的梯度。
+
+自此，PBF求解部分已经完成了。最后还有个技巧避免一些鬼畜的问题。下面介绍下。
+
+### PBF——Tensile Instability
+
+对于采用SPH插值技术计算密度的流体模拟方法，通常需要30∼40个邻居粒子才能使密度求值结果趋于静态密度。在邻居粒子不足的情况下，会导致求出的流体密度低于静态密度，由此造成压强为负数，原本粒子间的压力变为吸引力，使粒子产生不符合实际情况的凝聚，此即 SPH 的 Tensile Instability 问题在流体模拟中的具体体现，这导致的结果是流体表面的模拟给人感觉不真实。
+
+一种解决方法是采用了一种人工排斥力计算模型，当流体粒子距离过近时该排斥力会使它们分开，从而避免粒子凝聚现象。当流体粒子的压强变为负数时，用该排斥力代替压力可以有效消除SPH方法的Tensile Instability问题，防止负压强导致的粒子间非自然吸引。
+
+另一种解决方法，前述我们讲约束的时候提到约束有两种：
+
+1. 等式约束：总是进行投影操作。
+2. 不等式约束 ：只有在不等式约束条件不满足即 时才进行约束投影操作。
+
+所以，只有在上面的单边约束条件不满足，即 $\frac{ρ_i}{ρ_0} -1>0$ 或 $ρ_i>ρ_0$ 时，才进行约束投影操作。直观理解就是只有在粒子靠的比较近（流体压缩了）的情况下，才需要进行操作让粒子分开（保持流体不可压缩）。而当 $\frac{ρ_i}{ρ_0} -1≤0$ 或 $ρ_i≤ρ_0$ 不等式约束条件满足，此时不需要进行约束投影，因此也就避免了表面粒子凝聚问题。
+
